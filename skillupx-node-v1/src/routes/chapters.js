@@ -1,7 +1,7 @@
 import express from "express";
 import * as chapterController from "../controllers/chapterController.js";
 import * as testQuestionController from "../controllers/testQuestionController.js";
-import { addTestQuestionsToChapter } from "../controllers/ChapterTestController.js";
+import { addTestQuestionsToChapter } from "../controllers/chapterTestController.js";
 
 const router = express.Router();
 
