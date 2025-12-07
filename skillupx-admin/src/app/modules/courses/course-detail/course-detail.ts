@@ -141,7 +141,7 @@ export class CourseDetail implements OnInit, OnDestroy {
 
   openAddLesson() {
     if (!this.course) return;
-    this.router.navigate(['/courses', this.course.id, 'lessons', 'new']);
+    this.router.navigate(['/courses', this.course.id, 'lesson', 'new']);
   }
 
   deleteLesson(l: Lesson, event?: MouseEvent) {

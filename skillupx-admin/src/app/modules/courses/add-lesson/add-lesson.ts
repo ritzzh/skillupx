@@ -42,7 +42,6 @@ export class AddLesson {
       title: ['', Validators.required],
       summary: [''],
       slug: [''],
-      order_number: [0],
       duration_seconds: [0]
     });
     

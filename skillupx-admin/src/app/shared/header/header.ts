@@ -59,8 +59,8 @@ export class Header {
       case 'instructors':
         this.router.navigateByUrl('/instructors');
         break;
-      case 'sales':
-        this.router.navigateByUrl('/sales');
+      case 'lead-sheet':
+        this.router.navigateByUrl('/lead-sheet');
         break;
       case 'enrollments':
         this.router.navigateByUrl('/enrollments');

@@ -12,6 +12,7 @@ import instructorsRoutes from './routes/instructors.js';
 import lessonsRoutes from './routes/lessons.js';
 import chaptersRoutes from './routes/chapters.js';
 import enrollmentsRoutes from './routes/enrollments.js';
+import leadSheetRoutes from './routes/leadSheet.js';
 
 
 
@@ -25,6 +26,7 @@ app.use(morgan('dev'));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/leads', leadSheetRoutes);
 app.use('/api/courses', coursesRoutes);
 app.use('/api/instructors', instructorsRoutes);
 app.use('/api/lessons', lessonsRoutes);

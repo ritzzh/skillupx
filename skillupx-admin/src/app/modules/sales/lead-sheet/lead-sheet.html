@@ -1,1 +1,69 @@
-<p>lead-sheet works!</p>
+<div class="container mt-4">
+
+  <mat-card class="p-3">
+    <h2 class="mb-3">Lead Sheet</h2>
+
+    <!-- Loading State -->
+    <div class="d-flex justify-content-center my-5" *ngIf="loading">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+
+    <!-- Error Message -->
+    <div class="alert alert-danger" *ngIf="error">
+      {{ error }}
+    </div>
+
+    <!-- Table -->
+    <div *ngIf="!loading && leads.length > 0">
+      <table mat-table [dataSource]="leads" class="mat-elevation-z2 w-100">
+
+        <!-- ID -->
+        <ng-container matColumnDef="lead_id">
+          <th mat-header-cell *matHeaderCellDef> ID </th>
+          <td mat-cell *matCellDef="let row"> {{ row.lead_id }} </td>
+        </ng-container>
+
+        <!-- Email -->
+        <ng-container matColumnDef="email">
+          <th mat-header-cell *matHeaderCellDef> Email </th>
+          <td mat-cell *matCellDef="let row"> {{ row.email }} </td>
+        </ng-container>
+
+        <!-- Name -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef> Name </th>
+          <td mat-cell *matCellDef="let row"> {{ row.name }} </td>
+        </ng-container>
+
+        <!-- Phone -->
+        <ng-container matColumnDef="phone">
+          <th mat-header-cell *matHeaderCellDef> Phone </th>
+          <td mat-cell *matCellDef="let row"> {{ row.phone }} </td>
+        </ng-container>
+
+        <!-- Subject -->
+        <ng-container matColumnDef="subject">
+          <th mat-header-cell *matHeaderCellDef> Subject </th>
+          <td mat-cell *matCellDef="let row"> {{ row.subject }} </td>
+        </ng-container>
+
+        <!-- Created -->
+        <ng-container matColumnDef="created_at">
+          <th mat-header-cell *matHeaderCellDef> Created </th>
+          <td mat-cell *matCellDef="let row"> {{ row.created_at | date:'short' }} </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+      </table>
+    </div>
+
+    <!-- No Leads -->
+    <p class="text-muted mt-4" *ngIf="!loading && leads.length === 0">
+      No leads found.
+    </p>
+
+  </mat-card>
+
+</div>

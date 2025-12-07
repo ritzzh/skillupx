@@ -1,0 +1,1050 @@
+--
+-- PostgreSQL database dump
+--
+
+\restrict 5rc9eidjCCkZGIX1diTeLO9ZiSjIeMsFBfCthBKA1ZZkcTb5ddP4dDOVAptP5lO
+
+-- Dumped from database version 18.1
+-- Dumped by pg_dump version 18.1
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
+
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: audit_events; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.audit_events (
+    id integer NOT NULL,
+    actor_user_id integer,
+    event_type text,
+    payload jsonb,
+    created_at timestamp with time zone DEFAULT now()
+);
+
+
+ALTER TABLE public.audit_events OWNER TO postgres;
+
+--
+-- Name: audit_events_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.audit_events_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.audit_events_id_seq OWNER TO postgres;
+
+--
+-- Name: audit_events_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.audit_events_id_seq OWNED BY public.audit_events.id;
+
+
+--
+-- Name: chapters; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.chapters (
+    id integer NOT NULL,
+    lesson_id integer NOT NULL,
+    title text NOT NULL,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now(),
+    content_type character varying(255),
+    active boolean DEFAULT false,
+    video_url character varying(255),
+    chapter_name character varying(255),
+    resource_path character varying(255),
+    timed boolean DEFAULT false,
+    test_questions integer DEFAULT 0
+);
+
+
+ALTER TABLE public.chapters OWNER TO postgres;
+
+--
+-- Name: chapters_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.chapters_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.chapters_id_seq OWNER TO postgres;
+
+--
+-- Name: chapters_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.chapters_id_seq OWNED BY public.chapters.id;
+
+
+--
+-- Name: courses; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.courses (
+    id integer NOT NULL,
+    title text NOT NULL,
+    slug text,
+    short_description text,
+    long_description text,
+    price numeric(10,2) DEFAULT 0,
+    currency character(3) DEFAULT 'USD'::bpchar,
+    is_published boolean DEFAULT false,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now(),
+    deleted_at timestamp with time zone
+);
+
+
+ALTER TABLE public.courses OWNER TO postgres;
+
+--
+-- Name: courses_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.courses_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.courses_id_seq OWNER TO postgres;
+
+--
+-- Name: courses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.courses_id_seq OWNED BY public.courses.id;
+
+
+--
+-- Name: enrollments; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.enrollments (
+    id integer NOT NULL,
+    course_id integer NOT NULL,
+    instructor_id integer,
+    student_id integer NOT NULL,
+    enrolled_at timestamp with time zone DEFAULT now() NOT NULL,
+    enrollment_duration interval,
+    enrollment_type text,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now()
+);
+
+
+ALTER TABLE public.enrollments OWNER TO postgres;
+
+--
+-- Name: enrollments_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.enrollments_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.enrollments_id_seq OWNER TO postgres;
+
+--
+-- Name: enrollments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.enrollments_id_seq OWNED BY public.enrollments.id;
+
+
+--
+-- Name: instructors; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.instructors (
+    id integer NOT NULL,
+    user_id integer,
+    name text NOT NULL,
+    bio text,
+    avatar_url text,
+    contact_email character varying(255),
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now()
+);
+
+
+ALTER TABLE public.instructors OWNER TO postgres;
+
+--
+-- Name: instructors_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.instructors_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.instructors_id_seq OWNER TO postgres;
+
+--
+-- Name: instructors_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.instructors_id_seq OWNED BY public.instructors.id;
+
+
+--
+-- Name: lead_sheet; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.lead_sheet (
+    lead_id bigint NOT NULL,
+    email character varying(255) NOT NULL,
+    name character varying(255) NOT NULL,
+    phone character varying(50) NOT NULL,
+    subject character varying(255) NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    active boolean DEFAULT true NOT NULL
+);
+
+
+ALTER TABLE public.lead_sheet OWNER TO postgres;
+
+--
+-- Name: lead_sheet_lead_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.lead_sheet_lead_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.lead_sheet_lead_id_seq OWNER TO postgres;
+
+--
+-- Name: lead_sheet_lead_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.lead_sheet_lead_id_seq OWNED BY public.lead_sheet.lead_id;
+
+
+--
+-- Name: lesson_progress; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.lesson_progress (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    lesson_id integer NOT NULL,
+    completed_at timestamp with time zone DEFAULT now(),
+    progress_percent integer DEFAULT 0
+);
+
+
+ALTER TABLE public.lesson_progress OWNER TO postgres;
+
+--
+-- Name: lesson_progress_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.lesson_progress_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.lesson_progress_id_seq OWNER TO postgres;
+
+--
+-- Name: lesson_progress_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.lesson_progress_id_seq OWNED BY public.lesson_progress.id;
+
+
+--
+-- Name: lessons; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.lessons (
+    id integer NOT NULL,
+    course_id integer NOT NULL,
+    title text NOT NULL,
+    slug text,
+    summary text,
+    duration_seconds integer DEFAULT 0,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now(),
+    deleted_at timestamp with time zone
+);
+
+
+ALTER TABLE public.lessons OWNER TO postgres;
+
+--
+-- Name: lessons_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.lessons_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.lessons_id_seq OWNER TO postgres;
+
+--
+-- Name: lessons_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.lessons_id_seq OWNED BY public.lessons.id;
+
+
+--
+-- Name: live_classes; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.live_classes (
+    id integer NOT NULL,
+    course_id integer NOT NULL,
+    lesson_id integer,
+    title text,
+    description text,
+    start_time timestamp with time zone NOT NULL,
+    end_time timestamp with time zone,
+    meeting_url text,
+    provider jsonb,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now(),
+    deleted_at timestamp with time zone
+);
+
+
+ALTER TABLE public.live_classes OWNER TO postgres;
+
+--
+-- Name: live_classes_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.live_classes_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.live_classes_id_seq OWNER TO postgres;
+
+--
+-- Name: live_classes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.live_classes_id_seq OWNED BY public.live_classes.id;
+
+
+--
+-- Name: purchases; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.purchases (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    course_id integer NOT NULL,
+    purchase_price numeric(10,2) DEFAULT 0 NOT NULL,
+    currency character(3) DEFAULT 'USD'::bpchar,
+    purchased_at timestamp with time zone DEFAULT now(),
+    payment_provider text,
+    payment_reference text,
+    payment_metadata jsonb,
+    status text DEFAULT 'completed'::text NOT NULL,
+    refund_reference text,
+    access_expires_at timestamp with time zone,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now()
+);
+
+
+ALTER TABLE public.purchases OWNER TO postgres;
+
+--
+-- Name: purchases_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.purchases_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.purchases_id_seq OWNER TO postgres;
+
+--
+-- Name: purchases_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.purchases_id_seq OWNED BY public.purchases.id;
+
+
+--
+-- Name: study_resources; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.study_resources (
+    id integer NOT NULL,
+    course_id integer NOT NULL,
+    lesson_id integer,
+    title text NOT NULL,
+    description text,
+    resource_type text,
+    url text,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now(),
+    deleted_at timestamp with time zone
+);
+
+
+ALTER TABLE public.study_resources OWNER TO postgres;
+
+--
+-- Name: study_resources_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.study_resources_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.study_resources_id_seq OWNER TO postgres;
+
+--
+-- Name: study_resources_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.study_resources_id_seq OWNED BY public.study_resources.id;
+
+
+--
+-- Name: test_questions; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.test_questions (
+    id integer NOT NULL,
+    course_id integer NOT NULL,
+    lesson_id integer,
+    question_text text NOT NULL,
+    question_type text DEFAULT 'mcq'::text NOT NULL,
+    points integer DEFAULT 1,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now(),
+    deleted_at timestamp with time zone
+);
+
+
+ALTER TABLE public.test_questions OWNER TO postgres;
+
+--
+-- Name: test_questions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.test_questions_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.test_questions_id_seq OWNER TO postgres;
+
+--
+-- Name: test_questions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.test_questions_id_seq OWNED BY public.test_questions.id;
+
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users (
+    id integer NOT NULL,
+    name character varying(255) NOT NULL,
+    email character varying(255) NOT NULL,
+    phone character varying(30),
+    password_hash text NOT NULL,
+    is_admin boolean DEFAULT false,
+    is_instructor boolean DEFAULT false,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now(),
+    deleted_at timestamp with time zone
+);
+
+
+ALTER TABLE public.users OWNER TO postgres;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.users_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.users_id_seq OWNER TO postgres;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
+
+
+--
+-- Name: vw_course_overview; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public.vw_course_overview AS
+ SELECT id AS course_id,
+    title,
+    slug,
+    short_description,
+    price,
+    currency,
+    is_published,
+    created_at
+   FROM public.courses c;
+
+
+ALTER VIEW public.vw_course_overview OWNER TO postgres;
+
+--
+-- Name: audit_events id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.audit_events ALTER COLUMN id SET DEFAULT nextval('public.audit_events_id_seq'::regclass);
+
+
+--
+-- Name: chapters id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.chapters ALTER COLUMN id SET DEFAULT nextval('public.chapters_id_seq'::regclass);
+
+
+--
+-- Name: courses id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.courses ALTER COLUMN id SET DEFAULT nextval('public.courses_id_seq'::regclass);
+
+
+--
+-- Name: enrollments id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.enrollments ALTER COLUMN id SET DEFAULT nextval('public.enrollments_id_seq'::regclass);
+
+
+--
+-- Name: instructors id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.instructors ALTER COLUMN id SET DEFAULT nextval('public.instructors_id_seq'::regclass);
+
+
+--
+-- Name: lead_sheet lead_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.lead_sheet ALTER COLUMN lead_id SET DEFAULT nextval('public.lead_sheet_lead_id_seq'::regclass);
+
+
+--
+-- Name: lesson_progress id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.lesson_progress ALTER COLUMN id SET DEFAULT nextval('public.lesson_progress_id_seq'::regclass);
+
+
+--
+-- Name: lessons id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.lessons ALTER COLUMN id SET DEFAULT nextval('public.lessons_id_seq'::regclass);
+
+
+--
+-- Name: live_classes id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.live_classes ALTER COLUMN id SET DEFAULT nextval('public.live_classes_id_seq'::regclass);
+
+
+--
+-- Name: purchases id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.purchases ALTER COLUMN id SET DEFAULT nextval('public.purchases_id_seq'::regclass);
+
+
+--
+-- Name: study_resources id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.study_resources ALTER COLUMN id SET DEFAULT nextval('public.study_resources_id_seq'::regclass);
+
+
+--
+-- Name: test_questions id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.test_questions ALTER COLUMN id SET DEFAULT nextval('public.test_questions_id_seq'::regclass);
+
+
+--
+-- Name: users id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
+
+
+--
+-- Name: audit_events audit_events_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.audit_events
+    ADD CONSTRAINT audit_events_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: chapters chapters_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.chapters
+    ADD CONSTRAINT chapters_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: courses courses_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.courses
+    ADD CONSTRAINT courses_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: courses courses_slug_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.courses
+    ADD CONSTRAINT courses_slug_key UNIQUE (slug);
+
+
+--
+-- Name: enrollments enrollments_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.enrollments
+    ADD CONSTRAINT enrollments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: instructors instructors_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.instructors
+    ADD CONSTRAINT instructors_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: lead_sheet lead_sheet_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.lead_sheet
+    ADD CONSTRAINT lead_sheet_pkey PRIMARY KEY (lead_id);
+
+
+--
+-- Name: lesson_progress lesson_progress_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.lesson_progress
+    ADD CONSTRAINT lesson_progress_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: lesson_progress lesson_progress_user_id_lesson_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.lesson_progress
+    ADD CONSTRAINT lesson_progress_user_id_lesson_id_key UNIQUE (user_id, lesson_id);
+
+
+--
+-- Name: lessons lessons_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.lessons
+    ADD CONSTRAINT lessons_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: live_classes live_classes_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.live_classes
+    ADD CONSTRAINT live_classes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: purchases purchases_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.purchases
+    ADD CONSTRAINT purchases_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: study_resources study_resources_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.study_resources
+    ADD CONSTRAINT study_resources_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: test_questions test_questions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.test_questions
+    ADD CONSTRAINT test_questions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: enrollments uq_enrollments_course_student; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.enrollments
+    ADD CONSTRAINT uq_enrollments_course_student UNIQUE (course_id, student_id);
+
+
+--
+-- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_email_key UNIQUE (email);
+
+
+--
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: idx_courses_title_trgm; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_courses_title_trgm ON public.courses USING gin (to_tsvector('english'::regconfig, ((COALESCE(title, ''::text) || ' '::text) || COALESCE(short_description, ''::text))));
+
+
+--
+-- Name: idx_enrollments_course; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_enrollments_course ON public.enrollments USING btree (course_id);
+
+
+--
+-- Name: idx_enrollments_instructor; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_enrollments_instructor ON public.enrollments USING btree (instructor_id);
+
+
+--
+-- Name: idx_enrollments_student; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_enrollments_student ON public.enrollments USING btree (student_id);
+
+
+--
+-- Name: idx_instructors_user; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_instructors_user ON public.instructors USING btree (user_id);
+
+
+--
+-- Name: idx_lesson_progress_user; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_lesson_progress_user ON public.lesson_progress USING btree (user_id);
+
+
+--
+-- Name: idx_live_classes_course_start; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_live_classes_course_start ON public.live_classes USING btree (course_id, start_time);
+
+
+--
+-- Name: idx_purchases_course; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_purchases_course ON public.purchases USING btree (course_id);
+
+
+--
+-- Name: idx_purchases_user; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_purchases_user ON public.purchases USING btree (user_id);
+
+
+--
+-- Name: idx_study_resources_course; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_study_resources_course ON public.study_resources USING btree (course_id);
+
+
+--
+-- Name: idx_test_questions_course; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_test_questions_course ON public.test_questions USING btree (course_id);
+
+
+--
+-- Name: idx_users_email; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_users_email ON public.users USING btree (email);
+
+
+--
+-- Name: audit_events audit_events_actor_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.audit_events
+    ADD CONSTRAINT audit_events_actor_user_id_fkey FOREIGN KEY (actor_user_id) REFERENCES public.users(id) ON DELETE SET NULL;
+
+
+--
+-- Name: chapters chapters_lesson_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.chapters
+    ADD CONSTRAINT chapters_lesson_id_fkey FOREIGN KEY (lesson_id) REFERENCES public.lessons(id) ON DELETE CASCADE;
+
+
+--
+-- Name: enrollments enrollments_course_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.enrollments
+    ADD CONSTRAINT enrollments_course_id_fkey FOREIGN KEY (course_id) REFERENCES public.courses(id) ON DELETE CASCADE;
+
+
+--
+-- Name: enrollments enrollments_instructor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.enrollments
+    ADD CONSTRAINT enrollments_instructor_id_fkey FOREIGN KEY (instructor_id) REFERENCES public.instructors(id) ON DELETE SET NULL;
+
+
+--
+-- Name: enrollments enrollments_student_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.enrollments
+    ADD CONSTRAINT enrollments_student_id_fkey FOREIGN KEY (student_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: instructors instructors_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.instructors
+    ADD CONSTRAINT instructors_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE SET NULL;
+
+
+--
+-- Name: lesson_progress lesson_progress_lesson_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.lesson_progress
+    ADD CONSTRAINT lesson_progress_lesson_id_fkey FOREIGN KEY (lesson_id) REFERENCES public.lessons(id) ON DELETE CASCADE;
+
+
+--
+-- Name: lesson_progress lesson_progress_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.lesson_progress
+    ADD CONSTRAINT lesson_progress_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: lessons lessons_course_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.lessons
+    ADD CONSTRAINT lessons_course_id_fkey FOREIGN KEY (course_id) REFERENCES public.courses(id) ON DELETE CASCADE;
+
+
+--
+-- Name: live_classes live_classes_course_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.live_classes
+    ADD CONSTRAINT live_classes_course_id_fkey FOREIGN KEY (course_id) REFERENCES public.courses(id) ON DELETE CASCADE;
+
+
+--
+-- Name: live_classes live_classes_lesson_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.live_classes
+    ADD CONSTRAINT live_classes_lesson_id_fkey FOREIGN KEY (lesson_id) REFERENCES public.lessons(id) ON DELETE SET NULL;
+
+
+--
+-- Name: purchases purchases_course_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.purchases
+    ADD CONSTRAINT purchases_course_id_fkey FOREIGN KEY (course_id) REFERENCES public.courses(id) ON DELETE CASCADE;
+
+
+--
+-- Name: purchases purchases_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.purchases
+    ADD CONSTRAINT purchases_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: study_resources study_resources_course_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.study_resources
+    ADD CONSTRAINT study_resources_course_id_fkey FOREIGN KEY (course_id) REFERENCES public.courses(id) ON DELETE CASCADE;
+
+
+--
+-- Name: study_resources study_resources_lesson_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.study_resources
+    ADD CONSTRAINT study_resources_lesson_id_fkey FOREIGN KEY (lesson_id) REFERENCES public.lessons(id) ON DELETE SET NULL;
+
+
+--
+-- Name: test_questions test_questions_course_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.test_questions
+    ADD CONSTRAINT test_questions_course_id_fkey FOREIGN KEY (course_id) REFERENCES public.courses(id) ON DELETE CASCADE;
+
+
+--
+-- Name: test_questions test_questions_lesson_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.test_questions
+    ADD CONSTRAINT test_questions_lesson_id_fkey FOREIGN KEY (lesson_id) REFERENCES public.lessons(id) ON DELETE SET NULL;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
+\unrestrict 5rc9eidjCCkZGIX1diTeLO9ZiSjIeMsFBfCthBKA1ZZkcTb5ddP4dDOVAptP5lO
+
