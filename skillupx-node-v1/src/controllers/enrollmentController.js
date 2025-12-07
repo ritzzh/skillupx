@@ -2,6 +2,8 @@
 import { validationResult } from 'express-validator';
 import pool from '../config/db.js';
 import * as enrollmentModel from '../models/enrollmentModel.js';
+import * as courseModel from '../models/courseModel.js'
+import { buildCourseTree } from "../services/courseTreeService.js";
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 
@@ -169,6 +171,33 @@ export const searchUser = async (req, res, next) => {
       [q, q]
     );
     return res.json({ users: rows });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getUserCourseContent = async (req, res, next) => {
+  try {
+    const userId = Number(req.params.userId);
+
+    const enrollments = await enrollmentModel.listEnrollmentsByUser(userId);
+
+    const result = [];
+
+    for (const row of enrollments) {
+      const course = await courseModel.findCourseById(row.course_id);
+      if (!course) continue;
+
+      const lessonsWithChapters = await buildCourseTree(course.id);
+
+      result.push({
+        course,
+        lessons: lessonsWithChapters
+      });
+    }
+
+    res.json({ courses: result });
+
   } catch (err) {
     next(err);
   }

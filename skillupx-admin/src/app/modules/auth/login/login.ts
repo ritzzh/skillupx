@@ -46,7 +46,7 @@ export class Login {
     this.commonService.validateLogin(email, password).subscribe((result) => {
       console.log(result);
       if (result != null) {
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/lead-sheet']);
       }
     });
   }

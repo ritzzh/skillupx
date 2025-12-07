@@ -54,3 +54,18 @@ export const updateEnrollment = async (id, patch) => {
   const { rows } = await pool.query(q, vals);
   return rows[0] || null;
 };
+
+// src/models/enrollmentModel.js
+
+export const listEnrollmentsByUser = async (student_id) => {
+  const q = `
+    SELECT e.*, c.*
+    FROM enrollments e
+    JOIN courses c ON c.id = e.course_id
+    WHERE e.student_id = $1
+      AND c.deleted_at IS NULL
+  `;
+  const { rows } = await pool.query(q, [student_id]);
+  return rows;
+};
+

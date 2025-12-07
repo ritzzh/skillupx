@@ -218,6 +218,22 @@ export class CommonService {
       );
   }
 
+  // -------------------------------------
+// GET FULL USER COURSE CONTENT
+// -------------------------------------
+getUserFullCourses(userId: number): Observable<any> {
+  return this.http
+    .get(`${this.apiUrl}/enrollments/user/${userId}/full-courses`, this.authOptions())
+    .pipe(
+      map((res: any) => res.courses || []),
+      catchError(err => {
+        console.error("Failed to load full course tree:", err);
+        return throwError(() => err);
+      })
+    );
+}
+
+
 
   // -------------------------------------
   // LOGOUT

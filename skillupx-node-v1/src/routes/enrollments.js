@@ -28,4 +28,6 @@ router.delete('/:id', [ param('id').isInt() ], enrollmentController.deleteEnroll
 // helper search
 router.get('/search/user', [ query('q').notEmpty() ], enrollmentController.searchUser);
 
+router.get('/user/:userId/full-courses',[ param('userId').isInt() ],enrollmentController.getUserCourseContent);
+
 export default router;

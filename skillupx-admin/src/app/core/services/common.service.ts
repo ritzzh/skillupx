@@ -9,7 +9,7 @@ import {
   tap,
   throwError,
 } from "rxjs";
-import { environment } from "../../../environments/environtment";
+import { environment } from "../../../environments/environment";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 
 // ----------- INTERFACES -----------
