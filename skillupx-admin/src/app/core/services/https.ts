@@ -1,7 +1,7 @@
 // src/app/core/services/https.service.ts
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { environment } from '../../../environment/environtment'
+import { environment } from '../../../environments/environtment'
 
 export interface ApiOptions {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
